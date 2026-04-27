@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Фрибет Арбитраж</title>
+<title>Вилка Калькулятор</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -12,8 +12,8 @@
     --bg: #0a0a0f;
     --surface: #12121a;
     --border: #1e1e2e;
-    --accent: #00ff88;
-    --accent2: #ff6b35;
+    --accent: #00c2ff;
+    --accent2: #ff6baa;
     --text: #e8e8f0;
     --muted: #555570;
     --win: #00ff88;
@@ -28,7 +28,6 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: flex-start;
     padding: 32px 16px 60px;
     overflow-x: hidden;
   }
@@ -37,15 +36,15 @@
     content: '';
     position: fixed;
     top: -200px; left: 50%; transform: translateX(-50%);
-    width: 600px; height: 400px;
-    background: radial-gradient(ellipse, rgba(0,255,136,0.07) 0%, transparent 70%);
+    width: 700px; height: 400px;
+    background: radial-gradient(ellipse, rgba(0,194,255,0.06) 0%, transparent 70%);
     pointer-events: none;
     z-index: 0;
   }
 
   .wrapper {
     width: 100%;
-    max-width: 520px;
+    max-width: 540px;
     position: relative;
     z-index: 1;
   }
@@ -57,11 +56,11 @@
 
   header h1 {
     font-family: 'Bebas Neue', sans-serif;
-    font-size: clamp(42px, 10vw, 72px);
-    letter-spacing: 4px;
+    font-size: clamp(48px, 12vw, 80px);
+    letter-spacing: 6px;
     line-height: 1;
     color: var(--accent);
-    text-shadow: 0 0 40px rgba(0,255,136,0.4);
+    text-shadow: 0 0 40px rgba(0,194,255,0.4);
   }
 
   header p {
@@ -70,6 +69,38 @@
     letter-spacing: 3px;
     text-transform: uppercase;
     margin-top: 6px;
+  }
+
+  /* MODE TOGGLE */
+  .mode-toggle {
+    display: flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 4px;
+    margin-bottom: 20px;
+    gap: 4px;
+  }
+
+  .mode-btn {
+    flex: 1;
+    background: none;
+    border: none;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    padding: 10px 8px;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .mode-btn.active {
+    background: var(--accent);
+    color: var(--bg);
+    font-weight: 600;
   }
 
   .card {
@@ -104,7 +135,7 @@
     gap: 8px;
   }
 
-  .card-label .dot {
+  .dot {
     width: 6px; height: 6px;
     border-radius: 50%;
     flex-shrink: 0;
@@ -112,12 +143,15 @@
 
   .bk1 .dot { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
   .bk2 .dot { background: var(--accent2); box-shadow: 0 0 8px var(--accent2); }
+  .result .dot { background: #7c6bff; box-shadow: 0 0 8px #7c6bff; }
 
-  .field {
-    margin-bottom: 16px;
+  .row2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
   }
 
-  .field:last-child { margin-bottom: 0; }
+  .field { margin-bottom: 0; }
 
   label {
     display: block;
@@ -128,7 +162,7 @@
     margin-bottom: 6px;
   }
 
-  input {
+  input[type=number] {
     width: 100%;
     background: var(--bg);
     border: 1px solid var(--border);
@@ -143,23 +177,61 @@
     -moz-appearance: textfield;
   }
 
-  input::-webkit-inner-spin-button,
-  input::-webkit-outer-spin-button { -webkit-appearance: none; }
+  input[type=number]::-webkit-inner-spin-button,
+  input[type=number]::-webkit-outer-spin-button { -webkit-appearance: none; }
 
-  input:focus {
+  .bk1 input[type=number]:focus {
     border-color: var(--accent);
-    box-shadow: 0 0 0 2px rgba(0,255,136,0.1);
+    box-shadow: 0 0 0 2px rgba(0,194,255,0.1);
   }
 
-  .bk2 input:focus {
+  .bk2 input[type=number]:focus {
     border-color: var(--accent2);
-    box-shadow: 0 0 0 2px rgba(255,107,53,0.1);
+    box-shadow: 0 0 0 2px rgba(255,107,170,0.1);
+  }
+
+  /* Lock toggle */
+  .lock-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+  }
+
+  .lock-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    text-transform: uppercase;
+    flex: 1;
+  }
+
+  .lock-btns {
+    display: flex;
+    gap: 6px;
+  }
+
+  .lock-btn {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    color: var(--muted);
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 1px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+  }
+
+  .lock-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+    background: rgba(0,194,255,0.07);
   }
 
   /* RESULT */
-  .result .card-label { color: #7c6bff; }
-  .result .card-label .dot { background: #7c6bff; box-shadow: 0 0 8px #7c6bff; }
-
   .result-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -220,9 +292,8 @@
   .profit-val.negative { color: var(--loss); text-shadow: 0 0 20px rgba(255,68,102,0.4); }
   .profit-val.zero { color: var(--muted); }
 
-  .roi-bar-wrap {
-    margin-top: 12px;
-  }
+  /* ROI bar */
+  .roi-bar-wrap { margin-top: 12px; }
 
   .roi-header {
     display: flex;
@@ -243,11 +314,12 @@
   .roi-bar-fill {
     height: 100%;
     border-radius: 2px;
-    background: var(--accent);
+    background: var(--win);
     transition: width 0.4s cubic-bezier(.4,0,.2,1);
-    box-shadow: 0 0 8px var(--accent);
+    box-shadow: 0 0 8px var(--win);
   }
 
+  /* Scenarios */
   .scenarios {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -279,7 +351,8 @@
   }
 
   .scenario .sc-row .sc-num { color: var(--text); }
-  .scenario .sc-total {
+
+  .sc-total {
     display: flex;
     justify-content: space-between;
     font-size: 13px;
@@ -292,13 +365,45 @@
   .sc-total .positive { color: var(--win); }
   .sc-total .negative { color: var(--loss); }
 
+  /* arb indicator */
+  .arb-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 10px;
+    letter-spacing: 2px;
+    padding: 4px 10px;
+    border-radius: 2px;
+    text-transform: uppercase;
+    font-weight: 600;
+    margin-bottom: 14px;
+  }
+
+  .arb-badge.is-arb {
+    background: rgba(0,255,136,0.1);
+    border: 1px solid rgba(0,255,136,0.3);
+    color: var(--win);
+  }
+
+  .arb-badge.no-arb {
+    background: rgba(255,68,102,0.1);
+    border: 1px solid rgba(255,68,102,0.3);
+    color: var(--loss);
+  }
+
+  .badge-dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+
   .warning {
     background: rgba(255,107,53,0.08);
     border: 1px solid rgba(255,107,53,0.3);
     border-radius: 3px;
     padding: 12px 14px;
     font-size: 11px;
-    color: var(--accent2);
+    color: #ff9055;
     letter-spacing: 0.5px;
     line-height: 1.5;
     margin-top: 16px;
@@ -307,29 +412,13 @@
 
   .warning.visible { display: block; }
 
-  .tag {
-    display: inline-block;
-    font-size: 9px;
-    letter-spacing: 2px;
-    padding: 2px 7px;
-    border-radius: 2px;
-    text-transform: uppercase;
-    font-weight: 600;
-    margin-left: 8px;
-    vertical-align: middle;
-  }
-
-  .tag.good { background: rgba(0,255,136,0.15); color: var(--accent); }
-  .tag.bad { background: rgba(255,68,102,0.15); color: var(--loss); }
-  .tag.ok { background: rgba(124,107,255,0.15); color: #7c6bff; }
-
   .note {
     text-align: center;
     font-size: 10px;
     color: var(--muted);
     letter-spacing: 1px;
     margin-top: 24px;
-    line-height: 1.8;
+    line-height: 1.9;
   }
 
   @keyframes fadeIn {
@@ -343,49 +432,72 @@
 <body>
 <div class="wrapper">
   <header>
-    <h1>FREEBET CALC</h1>
-    <p>Арбитраж фрибета — конвертация в реальные деньги</p>
+    <h1>ВИЛКА CALC</h1>
+    <p>Калькулятор арбитражных ситуаций</p>
   </header>
 
+  <!-- MODE -->
+  <div class="mode-toggle">
+    <button class="mode-btn active" onclick="setMode('s1')" id="btn-s1">Фиксирую П1</button>
+    <button class="mode-btn" onclick="setMode('s2')" id="btn-s2">Фиксирую П2</button>
+    <button class="mode-btn" onclick="setMode('total')" id="btn-total">Фиксирую банк</button>
+  </div>
+
+  <!-- BK1 -->
   <div class="card bk1">
-    <div class="card-label"><span class="dot"></span>БК 1 — ФРИБЕТ</div>
-    <div class="field">
-      <label>Сумма фрибета ($)</label>
-      <input type="number" id="freebet" value="1000" min="1" step="1" oninput="calc()">
-    </div>
-    <div class="field">
-      <label>Коэффициент на исход A</label>
-      <input type="number" id="k1" value="2.10" min="1.01" step="0.01" oninput="calc()">
+    <div class="card-label"><span class="dot"></span>БК 1 — Исход П1</div>
+    <div class="row2">
+      <div class="field">
+        <label>Коэффициент П1</label>
+        <input type="number" id="k1" value="2.10" min="1.01" step="0.01" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Ставка П1 ($)</label>
+        <input type="number" id="s1" value="500" min="1" step="1" oninput="onS1()">
+      </div>
     </div>
   </div>
 
+  <!-- BK2 -->
   <div class="card bk2">
-    <div class="card-label"><span class="dot"></span>БК 2 — РЕАЛЬНЫЕ ДЕНЬГИ</div>
-    <div class="field">
-      <label>Коэффициент на исход B (противоположный)</label>
-      <input type="number" id="k2" value="2.05" min="1.01" step="0.01" oninput="calc()">
+    <div class="card-label"><span class="dot"></span>БК 2 — Исход П2</div>
+    <div class="row2">
+      <div class="field">
+        <label>Коэффициент П2</label>
+        <input type="number" id="k2" value="2.05" min="1.01" step="0.01" oninput="calc()">
+      </div>
+      <div class="field">
+        <label>Ставка П2 ($)</label>
+        <input type="number" id="s2" value="" min="1" step="1" placeholder="авто" oninput="onS2()">
+      </div>
     </div>
   </div>
 
+  <!-- RESULT -->
   <div class="card result">
     <div class="card-label"><span class="dot"></span>РЕЗУЛЬТАТ</div>
 
+    <div id="arb-badge" class="arb-badge is-arb">
+      <span class="badge-dot"></span>
+      <span id="arb-text">ВИЛКА ЕСТЬ</span>
+    </div>
+
     <div class="result-grid">
       <div class="result-item highlight">
-        <div class="rlabel">Ставка на БК2 ($)</div>
-        <div class="rval" id="stake2">—</div>
+        <div class="rlabel">Ставка П1 ($)</div>
+        <div class="rval" id="r-s1">—</div>
+      </div>
+      <div class="result-item highlight" style="--accent: var(--accent2)">
+        <div class="rlabel">Ставка П2 ($)</div>
+        <div class="rval" id="r-s2" style="color: var(--accent2)">—</div>
       </div>
       <div class="result-item">
-        <div class="rlabel">Конверсия фрибета</div>
-        <div class="rval" id="conversion">—</div>
+        <div class="rlabel">Общий банк ($)</div>
+        <div class="rval" id="r-bank">—</div>
       </div>
       <div class="result-item">
-        <div class="rlabel">Выплата при A</div>
-        <div class="rval" id="payA">—</div>
-      </div>
-      <div class="result-item">
-        <div class="rlabel">Выплата при B</div>
-        <div class="rval" id="payB">—</div>
+        <div class="rlabel">ROI вилки</div>
+        <div class="rval" id="r-roi">—</div>
       </div>
     </div>
 
@@ -398,7 +510,7 @@
 
     <div class="roi-bar-wrap">
       <div class="roi-header">
-        <span>Эффективность конверсии</span>
+        <span>Маржа арбитража</span>
         <span id="roi-pct">—</span>
       </div>
       <div class="roi-bar-bg">
@@ -408,90 +520,147 @@
 
     <div class="scenarios">
       <div class="scenario">
-        <div class="sc-title">📌 Исход A побеждает</div>
-        <div class="sc-row"><span>Фрибет выигрыш</span><span class="sc-num" id="sA-win">—</span></div>
-        <div class="sc-row"><span>Потеря БК2</span><span class="sc-num" id="sA-lose">—</span></div>
-        <div class="sc-total"><span>Итог:</span><span id="sA-total">—</span></div>
+        <div class="sc-title">📌 П1 побеждает</div>
+        <div class="sc-row"><span>Выплата БК1</span><span class="sc-num" id="sc1-pay">—</span></div>
+        <div class="sc-row"><span>Потеря БК2</span><span class="sc-num" id="sc1-lose">—</span></div>
+        <div class="sc-total"><span>Прибыль:</span><span id="sc1-profit">—</span></div>
       </div>
       <div class="scenario">
-        <div class="sc-title">📌 Исход B побеждает</div>
-        <div class="sc-row"><span>БК2 выигрыш</span><span class="sc-num" id="sB-win">—</span></div>
-        <div class="sc-row"><span>Фрибет сгорает</span><span class="sc-num" id="sB-lose">—</span></div>
-        <div class="sc-total"><span>Итог:</span><span id="sB-total">—</span></div>
+        <div class="sc-title">📌 П2 побеждает</div>
+        <div class="sc-row"><span>Выплата БК2</span><span class="sc-num" id="sc2-pay">—</span></div>
+        <div class="sc-row"><span>Потеря БК1</span><span class="sc-num" id="sc2-lose">—</span></div>
+        <div class="sc-total"><span>Прибыль:</span><span id="sc2-profit">—</span></div>
       </div>
     </div>
 
-    <div class="warning" id="warn">
-      ⚠ Коэффициент ниже 1.5 — конверсия слабая. Ищи котировки выше 2.0 для максимальной отдачи.
+    <div class="warning" id="warn-noarb">
+      ⚠ Вилки нет — при таких коэффициентах оба плеча не перекрываются. Нужно чтобы 1/K1 + 1/K2 &lt; 1.
     </div>
   </div>
 
   <div class="note">
-    РЕАЛЬНЫЕ ДЕНЬГИ ПОТРАЧЕНЫ: <span id="spent">—</span> &nbsp;·&nbsp; ПОЛУЧЕНО ГАРАНТИРОВАНО: <span id="earned">—</span>
+    СУММА СТАВОК: <span id="n-bank">—</span> &nbsp;·&nbsp;
+    ГАРАНТИРОВАННЫЙ ВОЗВРАТ: <span id="n-return">—</span> &nbsp;·&nbsp;
+    ПРИБЫЛЬ: <span id="n-profit">—</span>
   </div>
 </div>
 
 <script>
-function fmt(n) {
-  return '$' + n.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+let mode = 's1'; // 's1' | 's2' | 'total'
+
+function setMode(m) {
+  mode = m;
+  document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('btn-' + m).classList.add('active');
+
+  // enable/disable inputs
+  const s1 = document.getElementById('s1');
+  const s2 = document.getElementById('s2');
+
+  if (m === 's1') {
+    s1.removeAttribute('readonly'); s1.style.opacity = '1';
+    s2.setAttribute('readonly', true); s2.style.opacity = '0.4'; s2.placeholder = 'авто';
+  } else if (m === 's2') {
+    s2.removeAttribute('readonly'); s2.style.opacity = '1'; s2.placeholder = '';
+    s1.setAttribute('readonly', true); s1.style.opacity = '0.4';
+  } else {
+    // total mode — s1 is the total bank input, s2 auto
+    s1.removeAttribute('readonly'); s1.style.opacity = '1'; s1.placeholder = 'банк';
+    s2.setAttribute('readonly', true); s2.style.opacity = '0.4'; s2.placeholder = 'авто';
+  }
+  calc();
 }
 
+function onS1() { if (mode !== 's2') calc(); }
+function onS2() { if (mode === 's2') calc(); }
+
+function fmt(n, sign) {
+  const s = '$' + Math.abs(n).toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+  return (sign && n < 0 ? '−' : '') + s;
+}
+
+function pct(n) { return n.toFixed(2) + '%'; }
+
 function calc() {
-  const F  = parseFloat(document.getElementById('freebet').value) || 0;
   const K1 = parseFloat(document.getElementById('k1').value) || 0;
   const K2 = parseFloat(document.getElementById('k2').value) || 0;
+  if (K1 <= 1 || K2 <= 1) return;
 
-  if (!F || K1 <= 1 || K2 <= 1) return;
+  const margin = 1/K1 + 1/K2;
+  const isArb = margin < 1;
 
-  // S = F * (K1 - 1) / K2
-  const netFreebet = F * (K1 - 1);
-  const S = netFreebet / K2;
+  // Badge
+  const badge = document.getElementById('arb-badge');
+  badge.className = 'arb-badge ' + (isArb ? 'is-arb' : 'no-arb');
+  document.getElementById('arb-text').textContent = isArb
+    ? `ВИЛКА ЕСТЬ · маржа ${pct((1 - margin) * 100)}`
+    : `ВИЛКИ НЕТ · маржа ${pct((margin - 1) * 100)} не в нашу пользу`;
 
-  // Payouts
-  const payA = netFreebet;        // win on BK1 freebet, lose S on BK2
-  const payB = S * K2;            // win on BK2, freebet burns
+  document.getElementById('warn-noarb').className = 'warning' + (isArb ? '' : ' visible');
 
-  // Net profit (same either way)
-  const profitA = netFreebet - S; // freebet win − bk2 lost
-  const profitB = S * K2 - S;    // bk2 win − bk2 stake (net)
-  const profit = (profitA + profitB) / 2; // should be equal
+  let S1, S2;
 
-  const conv = (profit / F) * 100;
-  const roiW = Math.min(conv, 60);
+  if (mode === 's1') {
+    S1 = parseFloat(document.getElementById('s1').value) || 0;
+    // равная выплата: S1*K1 = S2*K2 → S2 = S1*K1/K2
+    S2 = S1 * K1 / K2;
+    document.getElementById('s2').value = S2 > 0 ? S2.toFixed(2) : '';
+  } else if (mode === 's2') {
+    S2 = parseFloat(document.getElementById('s2').value) || 0;
+    S1 = S2 * K2 / K1;
+    document.getElementById('s1').value = S1 > 0 ? S1.toFixed(2) : '';
+  } else {
+    // total bank
+    const bank = parseFloat(document.getElementById('s1').value) || 0;
+    // S1 = bank * (1/K2) / (1/K1 + 1/K2) = bank / K2 / margin
+    S1 = bank * (1/K2) / margin;
+    S2 = bank * (1/K1) / margin;
+    document.getElementById('s2').value = S2 > 0 ? S2.toFixed(2) : '';
+  }
 
-  document.getElementById('stake2').textContent = fmt(S);
-  document.getElementById('conversion').textContent = conv.toFixed(1) + '%';
-  document.getElementById('payA').textContent = fmt(payA);
-  document.getElementById('payB').textContent = fmt(payB);
+  if (!S1 || !S2) return;
+
+  const bank = S1 + S2;
+  const payA = S1 * K1;   // if P1 wins
+  const payB = S2 * K2;   // if P2 wins
+  const profitA = payA - bank;
+  const profitB = payB - bank;
+  const profit = Math.min(profitA, profitB); // guaranteed (should be equal in ideal case)
+  const roi = (profit / bank) * 100;
+
+  // Fill results
+  document.getElementById('r-s1').textContent = fmt(S1);
+  document.getElementById('r-s2').textContent = fmt(S2);
+  document.getElementById('r-bank').textContent = fmt(bank);
+  document.getElementById('r-roi').textContent = roi.toFixed(2) + '%';
 
   const profitEl = document.getElementById('profit');
   profitEl.textContent = fmt(profit);
-  profitEl.className = 'profit-val ' + (profit > 0 ? 'positive' : profit < 0 ? 'negative' : 'zero');
+  profitEl.className = 'profit-val ' + (profit > 0.005 ? 'positive' : profit < -0.005 ? 'negative' : 'zero');
 
-  document.getElementById('roi-pct').textContent = conv.toFixed(1) + '%';
-  document.getElementById('roi-bar').style.width = Math.max(0, (roiW / 60) * 100) + '%';
+  const roiW = Math.max(0, Math.min(roi, 10));
+  document.getElementById('roi-pct').textContent = roi.toFixed(2) + '%';
+  document.getElementById('roi-bar').style.width = (roiW / 10 * 100) + '%';
 
   // Scenarios
-  document.getElementById('sA-win').textContent = fmt(netFreebet);
-  document.getElementById('sA-lose').textContent = '−' + fmt(S);
-  const sATotal = document.getElementById('sA-total');
-  sATotal.textContent = fmt(profitA);
-  sATotal.className = profitA >= 0 ? 'positive' : 'negative';
+  document.getElementById('sc1-pay').textContent = fmt(payA);
+  document.getElementById('sc1-lose').textContent = '−' + fmt(S2);
+  const sc1p = document.getElementById('sc1-profit');
+  sc1p.textContent = (profitA >= 0 ? '+' : '−') + fmt(Math.abs(profitA));
+  sc1p.className = profitA >= 0 ? 'positive' : 'negative';
 
-  document.getElementById('sB-win').textContent = fmt(S * K2);
-  document.getElementById('sB-lose').textContent = '−' + fmt(S);
-  const sBTotal = document.getElementById('sB-total');
-  sBTotal.textContent = fmt(profitB);
-  sBTotal.className = profitB >= 0 ? 'positive' : 'negative';
+  document.getElementById('sc2-pay').textContent = fmt(payB);
+  document.getElementById('sc2-lose').textContent = '−' + fmt(S1);
+  const sc2p = document.getElementById('sc2-profit');
+  sc2p.textContent = (profitB >= 0 ? '+' : '−') + fmt(Math.abs(profitB));
+  sc2p.className = profitB >= 0 ? 'positive' : 'negative';
 
-  document.getElementById('spent').textContent = fmt(S);
-  document.getElementById('earned').textContent = fmt(profit + S);
-
-  // Warning if k1 < 1.5
-  document.getElementById('warn').className = 'warning' + (K1 < 1.5 ? ' visible' : '');
+  document.getElementById('n-bank').textContent = fmt(bank);
+  document.getElementById('n-return').textContent = fmt(Math.min(payA, payB));
+  document.getElementById('n-profit').textContent = (profit >= 0 ? '+' : '−') + fmt(Math.abs(profit));
 }
 
-calc();
+setMode('s1');
 </script>
 </body>
 </html>
